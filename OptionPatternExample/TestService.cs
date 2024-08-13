@@ -15,8 +15,8 @@ namespace OptionPatternExample
         {
             _options = options.Value;
 
-            Console.WriteLine($"CustomConfigurationOptions.Deadline:{_options.Deadline}");
-            Console.WriteLine($"CustomConfigurationOptions.Enabled:{_options.Enabled}");
+            Console.WriteLine($"IOptions CustomConfigurationOptions.Deadline:{_options.Deadline}");
+            Console.WriteLine($"IOptions CustomConfigurationOptions.Enabled:{_options.Enabled}");
         }
     }
 }
