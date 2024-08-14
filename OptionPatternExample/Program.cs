@@ -19,7 +19,7 @@ namespace OptionPatternExample
             ///new HostApplicationBuilder()를 통해 기본값으로 추가된 구성 공급자를 제거합니다
             ///기본 구성 공급자 목록은 https://tinyurl.com/apu8ux35 페이지에서 remark 항목을 참조합니다
             builder.Configuration.Sources.Clear(); 
-            builder.Configuration.AddJsonFile("appsettings.json", false, true);
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             //appsettings.json의 구성 요소 중 CustomConfigurationOptions 요소를 가져옵니다
             var options = builder.Configuration.GetSection(nameof(CustomConfigurationOptions))
@@ -37,29 +37,36 @@ namespace OptionPatternExample
 
             //종속성 주입 컨테이너에 TestService 클래스를 등록합니다
             builder.Services.AddTransient<TestService>();
-
             builder.Services.AddScoped<ScopedService>();
-
+            builder.Services.AddTransient<MonitorService>();
             builder.Services.AddTransient<NamedOptionsService>();
 
             ///TestService 클래스에 CustomConfigurationOptions이 주입됨을 확인하기 위해,
             ///TestService의 종속성을 해결합니다.
             var serviceProvider = builder.Services.BuildServiceProvider();
-            serviceProvider.GetRequiredService<TestService>();
+            //serviceProvider.GetRequiredService<TestService>();
 
-            using (var scope = serviceProvider.CreateScope())
-            {
-                scope.ServiceProvider.GetRequiredService<ScopedService>();
-            }
+            ///scope 범위를 지정해서 IOptionsSnapshot 인스턴스를 다시 생성합니다
+            //using (var scope = serviceProvider.CreateScope())
+            //{
+            //    scope.ServiceProvider.GetRequiredService<ScopedService>();
+            //}
 
-            Console.Write("appsetttings.json에서 CustomConfigurationOptions의 값을 변경 후 enter를 입력합니다 : ");
+            var monitorService = serviceProvider.GetRequiredService<MonitorService>();
+            monitorService.DisplayOption();
+
+            Console.Write("appsettings.json에서 CustomConfigurationOptions의 값을 변경 후 enter를 입력합니다 : ");
             Console.ReadLine();
 
-            using (var scope = serviceProvider.CreateScope())
-            {
-                scope.ServiceProvider.GetRequiredService<ScopedService>();
-            }
-            serviceProvider.GetRequiredService<TestService>();
+            monitorService.DisplayOption();
+
+            ///scope 범위를 지정해서 IOptionsSnapshot 인스턴스를 다시 생성합니다
+            //using (var scope = serviceProvider.CreateScope())
+            //{
+            //    scope.ServiceProvider.GetRequiredService<ScopedService>();
+            //}
+            ///IOption 의 경우 구성 값이 변경되었는지 확인합니다
+            //serviceProvider.GetRequiredService<TestService>();
 
             //var namedoptionService = serviceProvider.GetRequiredService<NamedOptionsService>();
 
