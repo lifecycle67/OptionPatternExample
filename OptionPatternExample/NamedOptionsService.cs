@@ -9,17 +9,17 @@ namespace OptionPatternExample
 {
     public class NamedOptionsService
     {
-        public readonly Features _personalizeFeature;
-        public readonly Features _weatherStationFeature;
+        public readonly OptionFeatures _personalizeFeature;
+        public readonly OptionFeatures _weatherStationFeature;
 
-        public NamedOptionsService(IOptionsSnapshot<Features> namedOptionsAccessor)
+        public NamedOptionsService(IOptionsSnapshot<OptionFeatures> namedOptionFeatures)
         {
-            _personalizeFeature = namedOptionsAccessor.Get(Features.Personalize);
-            _weatherStationFeature = namedOptionsAccessor.Get(Features.WeatherStation);
+            _personalizeFeature = namedOptionFeatures.Get(OptionFeatures.Base);
+            _weatherStationFeature = namedOptionFeatures.Get(OptionFeatures.Derive);
 
-            Console.WriteLine($"Personalize CustomConfigurationOptions.ApiKey:{_personalizeFeature.ApiKey}");
+            Console.WriteLine($"Personalize CustomConfigurationOptions.ApiKey:{_personalizeFeature.Url}");
             Console.WriteLine($"Personalize CustomConfigurationOptions.Enabled:{_personalizeFeature.Enabled}");
-            Console.WriteLine($"WeatherStation CustomConfigurationOptions.ApiKey:{_weatherStationFeature.ApiKey}");
+            Console.WriteLine($"WeatherStation CustomConfigurationOptions.ApiKey:{_weatherStationFeature.Url}");
             Console.WriteLine($"WeatherStation CustomConfigurationOptions.Enabled:{_weatherStationFeature.Enabled}");
         }
     }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System.Collections.Specialized;
-using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
 
 namespace OptionPatternExample
 {
@@ -16,6 +17,7 @@ namespace OptionPatternExample
             //configurationBuilder.AddJsonFile("appsettings.json", true, true);
             //var configurationRoot = configurationBuilder.Build();
             //var customConfigurationOptions = configurationRoot.GetSection(nameof(CustomConfigurationOptions)).Get<CustomConfigurationOptions>();
+
 
             HostApplicationBuilder builder = new HostApplicationBuilder();
             ///new HostApplicationBuilder()를 통해 기본값으로 추가된 구성 공급자를 제거합니다
@@ -31,16 +33,33 @@ namespace OptionPatternExample
             builder.Services.Configure<CustomConfigurationOptions>(
                 builder.Configuration.GetSection(nameof(CustomConfigurationOptions)));
 
-            builder.Services.Configure<Features>(Features.Personalize,
+            builder.Services.Configure<OptionFeatures>(OptionFeatures.Base,
                                                  builder.Configuration.GetSection("Features:Personalize"));
-            builder.Services.Configure<Features>(Features.WeatherStation,
+            builder.Services.Configure<OptionFeatures>(OptionFeatures.Derive,
                                                  builder.Configuration.GetSection("Features:WeatherStation"));
+
+            //builder.Services.AddOptionsWithValidateOnStart<ValidateOption>()
+            //                //.AddOptions<ValidateOption>()
+            //                .Bind(builder.Configuration.GetSection(ValidateOption.SectionName))
+            //                .ValidateDataAnnotations()
+            //                .Validate(config =>
+            //                {
+            //                    if (config.Qty >= 200)
+            //                        return config.DueDate < DateTime.Parse("2025-12-31 23:59:59");
+            //                    return true;
+            //                }, "Qty가 200이상 일 경우 DueDate는 2025-12-31 23:59:59 이전이어야 합니다.");
+
+            builder.Services.Configure<ValidateOption>(
+                builder.Configuration.GetSection(ValidateOption.SectionName));
+
 
             //종속성 주입 컨테이너에 TestService 클래스를 등록합니다
             builder.Services.AddTransient<TestService>();
             builder.Services.AddScoped<ScopedService>();
             builder.Services.AddTransient<MonitorService>();
             builder.Services.AddTransient<NamedOptionsService>();
+            builder.Services.AddTransient<ValidationService>();
+            builder.Services.AddSingleton<IValidateOptions<ValidateOption>, CustomeValidatation>();
 
             ///TestService 클래스에 CustomConfigurationOptions이 주입됨을 확인하기 위해,
             ///TestService의 종속성을 해결합니다.
@@ -54,14 +73,18 @@ namespace OptionPatternExample
             //RequestManyIOptionsMonitorService(serviceProvider);
             //GC.Collect();
 
-            UseNamedOptionsService(serviceProvider);
+            ///Named Options 
+            //UseNamedOptionsService(serviceProvider);
+
+            ///options validation
+            UseValidateOptionService(serviceProvider);
 
             ///IOption 의 경우 구성 값이 변경되었는지 확인합니다
             //serviceProvider.GetRequiredService<TestService>();
 
             //var namedoptionService = serviceProvider.GetRequiredService<NamedOptionsService>();
-
-            Console.ReadLine();
+            var host = builder.Build();
+            host.Run();
         }
 
         private static void IOptionsSnapshotService(ServiceProvider serviceProvider)
@@ -110,6 +133,11 @@ namespace OptionPatternExample
         private static void UseNamedOptionsService(ServiceProvider serviceProvider)
         {
             serviceProvider.GetRequiredService<NamedOptionsService>();
+        }
+
+        private static void UseValidateOptionService(ServiceProvider serviceProvider)
+        {
+            serviceProvider.GetRequiredService<ValidationService>();
         }
     }
 }
