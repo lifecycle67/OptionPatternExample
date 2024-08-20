@@ -9,18 +9,18 @@ namespace OptionPatternExample
 {
     public class NamedOptionsService
     {
-        public readonly OptionFeatures _personalizeFeature;
-        public readonly OptionFeatures _weatherStationFeature;
+        public readonly OptionFeatures _baseFeature;
+        public readonly OptionFeatures _deriveFeature;
 
         public NamedOptionsService(IOptionsSnapshot<OptionFeatures> namedOptionFeatures)
         {
-            _personalizeFeature = namedOptionFeatures.Get(OptionFeatures.Base);
-            _weatherStationFeature = namedOptionFeatures.Get(OptionFeatures.Derive);
+            _baseFeature = namedOptionFeatures.Get(OptionFeatures.Base);
+            _deriveFeature = namedOptionFeatures.Get(OptionFeatures.Derive);
 
-            Console.WriteLine($"Personalize CustomConfigurationOptions.ApiKey:{_personalizeFeature.Url}");
-            Console.WriteLine($"Personalize CustomConfigurationOptions.Enabled:{_personalizeFeature.Enabled}");
-            Console.WriteLine($"WeatherStation CustomConfigurationOptions.ApiKey:{_weatherStationFeature.Url}");
-            Console.WriteLine($"WeatherStation CustomConfigurationOptions.Enabled:{_weatherStationFeature.Enabled}");
+            Console.WriteLine($"Base OptionFeatures.Url:{_baseFeature.Url}");
+            Console.WriteLine($"Base OptionFeatures.Enabled:{_baseFeature.Enabled}");
+            Console.WriteLine($"Derive OptionFeatures.Url:{_deriveFeature.Url}");
+            Console.WriteLine($"Derive OptionFeatures.Enabled:{_deriveFeature.Enabled}");
         }
     }
 }

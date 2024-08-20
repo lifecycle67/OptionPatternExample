@@ -20,7 +20,7 @@ namespace OptionPatternExample
 
 
             HostApplicationBuilder builder = new HostApplicationBuilder();
-            ///new HostApplicationBuilder()를 통해 기본값으로 추가된 구성 공급자를 제거합니다
+            ///builder.Configuration.Sources.Clear()를 통해 기본값으로 추가된 구성 공급자를 제거합니다
             ///기본 구성 공급자 목록은 https://tinyurl.com/apu8ux35 페이지에서 remark 항목을 참조합니다
             builder.Configuration.Sources.Clear();
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -34,9 +34,9 @@ namespace OptionPatternExample
                 builder.Configuration.GetSection(nameof(CustomConfigurationOptions)));
 
             builder.Services.Configure<OptionFeatures>(OptionFeatures.Base,
-                                                 builder.Configuration.GetSection("Features:Personalize"));
+                                                 builder.Configuration.GetSection("OptionFeatures:Base"));
             builder.Services.Configure<OptionFeatures>(OptionFeatures.Derive,
-                                                 builder.Configuration.GetSection("Features:WeatherStation"));
+                                                 builder.Configuration.GetSection("OptionFeatures:Derive"));
 
             //builder.Services.AddOptionsWithValidateOnStart<ValidateOption>()
             //                //.AddOptions<ValidateOption>()
@@ -74,10 +74,10 @@ namespace OptionPatternExample
             //GC.Collect();
 
             ///Named Options 
-            //UseNamedOptionsService(serviceProvider);
+            UseNamedOptionsService(serviceProvider);
 
             ///options validation
-            UseValidateOptionService(serviceProvider);
+            //UseValidateOptionService(serviceProvider);
 
             ///IOption 의 경우 구성 값이 변경되었는지 확인합니다
             //serviceProvider.GetRequiredService<TestService>();
